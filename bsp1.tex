@@ -1,0 +1,597 @@
+\documentclass[11pt]{report}
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\renewcommand{\contentsname}{Kazalo}
+\renewcommand{\figurename}{Slika}
+\hypersetup{colorlinks= true, linkcolor= black}
+\setcounter{secnumdepth}{0}
+\newlength{\drop}
+\begin{document}
+	\begin{titlepage}
+		\drop=0.1\textheight
+		\centering
+		\vspace*{\baselineskip}
+		\rule{\textwidth}{1.6pt}\vspace*{-\baselineskip}\vspace*{2pt}
+		\rule{\textwidth}{0.4pt}\\[\baselineskip]
+		{\LARGE LOTKA - VOLTERRA}\\[0.2\baselineskip]
+		\rule{\textwidth}{0.4pt}\vspace*{-\baselineskip}\vspace{3.2pt}
+		\rule{\textwidth}{1.6pt}\\[\baselineskip]
+		\scshape
+		Lotka-Volterra projekt pri predmetu Matematična fizika\\
+		\vspace{5mm}
+		Pivka, 7.9.2023\par
+		\vspace{20mm}
+		AVTOR:
+		\vspace*{2\baselineskip}
+		\\[\baselineskip]
+		{\Large DENIS NEDIĆ\par}
+		
+		\vfill
+		{\scshape Nazadnje urejeno} \\
+		{\large 7.9.2023}\par
+	\end{titlepage}
+\tableofcontents
+	\section{Uvod}
+	V 2. letniku programa Fizika na fakulteti za matematiko in fiziko sem pri predmetu Matematična fizika raziskoval Lotka-Volterra(plenilec-plen) modele. Modele bom v naslednjih straneh opisal, razložil, za lažjo predstavo pa dodal še nekaj grafov.
+	\section{Lotka-Volterra model}
+	Lotka-Volterra model (v nadaljevanju bom pisal okrajšano LV) je prvi predlagal Alfred J. Lotka leta 1910, kot del teorije avtokatalitičnih kemijskih reakcij. Ta model je v osnovi logistična enačba, ki jo je prvotno razvil Pierre François Verhulst. Leta 1920 je Lotka model razširil v "organske sisteme" preko Andreyja Kolmogorova in kot primer uporabil rastlinsko vrsto in rastlinojedo živalsko vrsto. Leta 1925 je enačbe uporabil za analizo interakcij plenilec-plen v svoji knjigi o biomatematiki. Isti niz enačb je leta 1926 objavil tudi Vito Volterra, matematik in fizik, ki je postal zainteresiran za matematično biologijo. Enačbe LV so bile razvite za opis dinamike bioloških sistemov. Ta sistem nelinearnih diferencialnih enačb se lahko opiše kot bolj splošna različica Kolmogorovega modela, saj se osredotoča le na interakcije med plenilcem in plenom ter prezre tekmovanje, bolezni in medsebojno koristne odnose, ki jih vključuje Kolmogorovljev model. Enačbe LV je mogoče preprosto zapisati kot sistem nelinearnih diferencialnih enačb prvega reda (ODE). Ker so enačbe diferencialne narave, so rešitve deterministične (ni naključja in enaki začetni pogoji bodo privedle do istega rezultata), čas pa je kontinuiran (generacije plenilcev in plena se nenehno prekrivajo). Kot pri mnogih drugih matematičnih modelih so bile pri oblikovanju enačb LV narejene številne predpostavke. Te predpostavke so:
+	\begin{itemize}
+		\item Plenu ne zmanjka hrane.
+		\item Količina hrane, ki jo plen prejme, je neposredno povezana s številčnostjo plenilske populacije.
+		\item Hitrost spremembe populacije je neposredno sorazmerna z njeno velikostjo.
+		\item Okolje je konstantno in genska prilagoditev ni zanemarljiva.
+		\item Plenilci nikoli ne prenehajo jesti.
+	\end{itemize}
+	Na podlagi teh predpostavk se enačbe LV zapiše na sledeč način:
+	\begin{flalign}
+		\frac{dx}{dt} = \alpha x - \beta x y 
+	\end{flalign}
+	\vspace{-7mm}
+	\begin{flalign}
+		\frac{dy}{dt} = \gamma x y - \delta y 
+	\end{flalign}
+	kjer $\frac{dx}{dt}$ in $\frac{dy}{dt}$ predstavljata spremembi populacije plena in plenilca, $x$ in $y$ sta števili plena in plenilca,
+	\vspace{5mm}
+	$\alpha$, $\beta$, $\gamma$ in $\delta$ pa so pozitivne realne konstante.
+	Če si bolje pogledamo enačbe LV opazimo, da se plen brez kakršnekoli ovire razmnožuje in sicer eksponentno.To predstavlja člen $\alpha x $. Konstanta $\alpha$ torej predstavlja stopnjo razmnoževanja plena. Enačba prav tako kaže, da je hitrost, s katero plenilci jedo plen, sorazmerna s produktom števila plenov in števila plenilcev, drugače povedano kako pogosto se populaciji srečata. To ponazarja člen $\beta x y $. Tu pa lahko rekli, da konstanta $\beta$ predstavlja število, ki pove na koliko plena vpliva en plenilec. Vidimo, da se v odsotnosti plenilca ($y$=0), populacija plena ne more manjšati, oziroma se eksponentno veča.
+
+	Poglejmo si še enačbo za plenilce. Prvi člen $\gamma x y$ je podoben členu $\beta x y $ v enačbi za plen, le da tu ta člen pove s kakšno hitrostjo se plenilec razmnožuje. Opazimo, da sta konstanti $\beta$ in $\gamma$ pred zmnožkom $xy$ različni, za čimer se skriva logičen premislek. Če vzamemo za primer zajce in lisice, lahko sklepamo, da zaradi ene lisice umre več zajcev kot se lisic razmnoži zaradi enega zajca. Člen $\delta y $ pa predstavlja naravno smrt plenilca, ki je eksponentna. Torej v odsotnosti plena ($x$=0) plenilec umira.\\
+	Sistem enačb sem reševal v pythonu s pomočjo scipy.integrate.solveivp, ki rešuje problem začetnih vrednosti, metoda, ki pa jo je program uporabil je bila Runge-Kutta45.
+	Poglejmo rešitve pri naslednjih pogojih.\\
+	Izberimo konstante: $\alpha = 0.1$, $\beta=0.025$ $\gamma=0.01$ in $\delta=0.1$.
+	Začetne pogoje na sliki (1) sem izbral sam, na sliki (2) pa so bili začetni pogoji naključno izbrani, za več različnih zač. vrednosti.
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\begin{minipage}{0.85\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.9\textwidth]{Figure_2.png}
+			\hspace{60mm}
+			\vspace{-5mm}
+			\caption{Populaciji plena in plenilca v odvisnosti od časa}
+		\end{minipage}
+	\end{figure}
+	Iz slike (1) lahko razberemo, da se s časom populaciji obeh vrst vrneta v prvotno stanje in se naprej ponavlja vzorec, torej v tem modelu LV plen in plenilec lahko sobivata brez izumrtja ene vrste.
+	\newpage
+	\vspace{4mm}
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{6mm}
+		\begin{minipage}{0.9\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=1.25\textwidth]{stacionarna.png}
+			\hspace*{5mm}
+		~
+			\vspace{-11mm}
+			\caption{Lotka-Volterra pri naključnih zač. pogojih s stacionarno točko}
+		\end{minipage}
+	\end{figure}
+	Iz slike (2) je še bolj nazorno videti, kako se število populacij ene in druge vrste vedno vrne v prvotno stanje, zato so tudi sklenjene krivulje.
+	Je pa zanimiva tista majhna svetlo modra točka v sredini, kajti tista točka je ena izmed stacionarnih točk. Kaj to pomeni? To pomeni da se v teh točkah enačbi (1) in (2) ne spreminjata.
+	Kako dobimo te točke?\\
+	Torej ker smo rekli, da se enčbi ne spreminjata, lahko preprosto $\frac{dx}{dt}$ in $\frac{dy}{dt}$ postavimo na nič in napišemo enačbi (1) in (2) v naslednji obliki:\\
+	\vspace{-7mm}
+	\begin{flalign}
+		0 = x(\alpha  - \beta y) \nonumber
+	\end{flalign}
+	\vspace{-9mm}
+	\begin{flalign}
+		0 = y(\gamma x  - \delta)  \nonumber
+	\end{flalign}
+	Rešimo enačbi in vidimo, da sta $(0,0)$ in $(\frac{\delta}{\gamma}, \frac{\alpha}{\beta})$ stacionarni točki. Točka $(\frac{\delta}{\gamma}, \frac{\alpha}{\beta})$ predstavlja ravno tisto svetlo modro točko.
+	Zapišimo še Jacobija za naš LV sistem in ga izvrednotimo v stacionarnih točkah, da vidimo za kakšno vrsto točk gre:\\
+	
+	\hspace{35mm}
+	$\begin{pmatrix}
+		\alpha - \beta y  & -\beta x \\ 
+		\gamma y & \gamma x - \delta
+	\end{pmatrix}$
+	\vspace{2mm}
+	= ${\bf J}$\\
+	Poglejmo si najprej točko $(0,0)$:
+	
+	\hspace{35mm}
+	$\begin{pmatrix}
+		\alpha  & 0 \\ 
+		0 & - \delta
+	\end{pmatrix}$
+	\vspace{2mm}
+	= ${\bf J(0,0)}$ \\
+	Vidimo, da sta lastni vrednosti $\lambda_1 = \alpha$ in $\lambda_2 = -\delta$. V modelu sta $\alpha$ in $\delta$ vedno pozitivni, zato sta lastni vrednosti nasprotnih predznakov, kar pa pomeni, da je točka $(0,0)$ sedlo.\\
+	Poglejmo si še kaj se dogaja v točki $(\frac{\delta}{\gamma}, \frac{\alpha}{\beta})$:
+	
+	
+	
+	\hspace{35mm}
+	$\begin{pmatrix}
+		0 & -\frac{\delta \beta}{\gamma} \\ 
+		\frac{\gamma \alpha}{\beta}  & 0
+	\end{pmatrix}$
+	= ${\bf J(\frac{\delta}{\gamma}, \frac{\alpha}{\beta})}$\\
+ 	Lastni vrednosti sta v tem primeru konjugirano imaginarni in sicer $\lambda_1 = i\sqrt{\alpha \delta}$ in $\lambda_2 = -i\sqrt{\alpha \delta}$.
+ 	Matematičnega ozadja za to točko ne bom razlagal, je pa ta točka privlačna spirala.
+ 	\begin{figure}[!ht]
+ 		\centering
+ 		\hspace{-35mm}
+ 		\vspace{8mm}
+ 		\begin{minipage}{0.8\textwidth}
+ 			\centering
+ 			\vspace{-5mm}
+ 			\includegraphics*[width=0.8\textwidth]{Figure_3.png}
+ 			\hspace{-10mm}
+ 			\vspace{-5mm}
+ 			\caption{LV v bližini stacionarne točke}
+ 		\end{minipage}
+ 	\end{figure}
+ 	Pravzaprav je ta elipsa svetlo modra točka.
+ 	\newpage
+ 	\section{LV model z dodatno hrano}
+ 	V tem modelu Lotka-Volterra pa dodamo plenu hrano, posledica tega pa je da se plen ne razmnožuje več eksponentno, saj bo odvisno od tega koliko hrane bo na voljo.
+ 	V tem poglavju se bom dotaknil različnih modelov, v enih bom privzel, da se hrana povečuje linearno ali eksponentno, v drugih bom privzel, da plen ne umira naravno, v nekaterih pa da plenilec umira linearno ali ekpsonentno, kasneje pa rezultate primerjal.
+ 	\subsection{Linearno naraščanje hrane}
+ 	Prvo zapišimo sistem enačb, katerega bomo reševali.
+ 	\hspace{-4mm}
+ 	\begin{flalign}
+ 		\hspace*{-12mm}
+ 		\frac{dx}{dt} = \alpha - \beta x y 
+ 	\end{flalign}
+ 	\vspace{-7mm}
+ 	\begin{flalign}
+ 		\frac{dy}{dt} = \gamma x y - \delta y - \epsilon y z
+ 	\end{flalign}
+ 	\vspace{-7mm}
+ 	\begin{flalign}
+ 		\hspace*{-12mm}
+ 		\frac{dz}{dt} = \eta y z - \kappa z 
+ 	\end{flalign}
+ 	\\
+ 	\\
+ 	\\
+ 	Kot prej $\frac{dx}{dt}$, $\frac{dy}{dt}$ in $\frac{dz}{dt}$ predstavljajo spremembo populacij, $\alpha$ je faktor razmnoževanja hrane, $\beta$ predstavlja število, ki pove na koliko hrane vpliva en plen, $\gamma$ pove na koliko plena vpliva ena enota hrane, $\delta$ je faktor naravne smrti, $\epsilon$ pove na koliko plena vpliva en plenilec, $\eta$ pove na koliko plenilcev vpliva en plen in $\kappa$ predstavlja naravno smrt plenilca.\\
+ 	Iz prve enačbe lahko razberemo, da v odsotnosti plena($y=0$), hrane ne bo zmanjkalo in sicer bo količina linearno naraščala.
+ 	Podobno lahko vidimo v enačbi (5), in sicer v odsotnosti plena, bo količina plena pojemala eksponentno, do izumrtja.
+ 	Enačba (4), je malo bolj zakomplicirana, saj je odvisna od vseh vrst v prehranjevalni verigi. V odsotnosti hrane ($x=0$) vidimo, da se populacija plena močno začne zmanjševati, saj poleg naravne smrti, jih jedo še plenilci. V odsotnosti plenilca pa se sistem skoraj pretvori na običajen LV sistem (enačbo (5) izgubimo, prav tako pa 3. člen v enačbi (4) odpade),le da je prvi člen v enačbi (3) malo drugačen\\
+ 	Poglejmo si več na konkretnem primeru:\\
+ 	Parametre sem izbral na sledeč način: $\alpha =0.2$, $\beta=0.05$, $\gamma = 0.02$, $\delta = 0.05$, $\epsilon = 0.13$, $\eta = 0.05$ in $\kappa = 0.02$.
+ 	\newpage
+ 	\begin{figure}[!ht]
+ 		\centering
+ 		\hspace{-35mm}
+ 		\vspace{8mm}
+ 		\begin{minipage}{0.8\textwidth}
+ 			\centering
+ 			\vspace{-5mm}
+ 			\includegraphics*[width=0.8\textwidth]{LV1.png}
+ 			\hspace{-20mm}
+ 			\vspace{-5mm}
+ 			\caption{Populacije v odvisnosti od časa}
+ 		\end{minipage}
+ 	\end{figure}
+ 	\begin{figure}[!ht]
+ 		\centering
+ 		\hspace{-35mm}
+ 		\vspace{8mm}
+ 		\begin{minipage}{0.8\textwidth}
+ 			\centering
+ 			\vspace{-5mm}
+ 			\includegraphics*[width=0.8\textwidth]{LV2.png}
+ 			\hspace{-20mm}
+ 			\vspace{-5mm}
+ 			\caption{Populacije v odvisnosti od časa 3D}
+ 		\end{minipage}
+ 	\end{figure}
+
+ 	Kar lahko opazimo iz teh grafov, je to da v neskončnosti, grafi limitirajo proti določeni vrednosti, in sicer stacionarni točki.
+ 	Kot pri navadnem modelu, poskusimo najti to stacionarno točko.
+ 	Enačbe (3), (4) in (5) enačimo z nič in rešimo sistem enačb:\\
+ 	\\
+ 	\vspace{-15mm}
+ 	\begin{flalign}
+ 		\vspace{-15mm}
+ 		\hspace*{-12mm}
+ 		0 = \alpha - \beta x y \nonumber
+ 	\end{flalign}
+ 	\vspace{-9mm}
+ 	\begin{flalign}
+ 		0 = \gamma x y - \delta y - \epsilon y z \nonumber
+ 	\end{flalign}
+ 	\vspace{-8mm}
+ 	\begin{flalign}
+ 		\hspace*{-10.5mm}
+ 		0 = \eta y z - \kappa z \nonumber
+ 	\end{flalign}
+ 	Opazimo, da stacionarna točka ne more imeti $x=0$ ali $y=0$, kajti v tem primeru velja $\alpha = 0$, kar pa ni res.
+ 	Sistem rešujemo tako, da iz zadnje enačbe izrazimo y, ga ustavimo v prvo, izrazimo x ga vstavimo v drugo enačbo in dobimo rešitev 
+ 	($\frac{\alpha \eta}{\beta \kappa}$, $\frac{\kappa}{\eta}$, $\frac{\frac{\delta \alpha \eta}{\beta \kappa} - \gamma}{\epsilon}$) oziroma (10, 0.4, 1.15).
+ 	Preverimo, kakšne vrste stacionarna točka je to.
+ 	Zapišimo Jacobija za ta sistem: \\
+ 	
+ 	\hspace{25mm}
+ 	$\begin{pmatrix}
+ 		-\beta y & -\beta x & 0 \\
+ 		\delta y & \delta x - \gamma - \epsilon z & - \epsilon y \\
+ 		0 & \eta z & \eta y - \kappa 
+ 	\end{pmatrix}$
+ 	$=J$\\
+ 	Ga izvrednotimo v stacionarni točki in pogledamo lastne vrednosti te matrike:\\
+ 	
+ 	\hspace{25mm}
+ 	$\begin{pmatrix}
+ 		-\frac{\beta \kappa}{\eta} & -\frac{\alpha \eta}{\kappa}& 0 \\
+ 		\frac{\delta \kappa}{\eta}& 0 & - \frac{\epsilon \kappa}{\eta} \\
+ 		0 & \frac{\frac{\kappa ² \alpha \delta }{\beta \kappa} - \gamma}{\epsilon} & 0
+ 	\end{pmatrix}$
+ 	$=J(\frac{\alpha \eta}{\beta \kappa},\frac{\kappa}{\eta}, \frac{\frac{\delta \alpha \eta}{\beta \kappa} - \gamma}{\epsilon})$ \\
+ 
+ 	Lastne vrednosti so pre-grde da bi jih pisal, lahko pa vidimo v prejšnjem grafu, da je stacionarna točka ponovno spiralno privlačna, točka kateri pa se spirala približuje ustreza točki, katero smo mi izračunali.
+	\begin{figure}
+		\centering
+		\hspace{-35mm}
+		\begin{minipage}{0.7\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.7\textwidth]{LV3(1).png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa 3D}
+		\end{minipage}
+	\end{figure}
+	\newpage
+	\subsection{Eksponentno naraščanje hrane}
+	Podobno kot prej, zapišemo sistem enačb, katerega bomo reševali:
+	\begin{flalign}
+		\hspace*{-12mm}
+		\frac{dx}{dt} = \alpha x - \beta x y 
+	\end{flalign}
+	\vspace{-7mm}
+	\begin{flalign}
+		\frac{dy}{dt} = \gamma x y - \delta y - \epsilon y z
+	\end{flalign}
+	\vspace{-7mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		\frac{dz}{dt} = \eta y z - \kappa z 
+	\end{flalign}
+	Kot vidimo, hrana tu ne narašča več linearno temveč eksponentno.
+	Vse količine ostanejo enako definirane kot v poglavju z linearnim naraščanjem. Torej $\frac{dx}{dt}$, $\frac{dy}{dt}$ in $\frac{dz}{dt}$ predstavljajo spremembo populacij, $\alpha$ je faktor razmnoževanja hrane, $\beta$ predstavlja število, ki pove na koliko hrane vpliva en plen, $\gamma$ pove na koliko plena vpliva ena enota hrane, $\delta$ je faktor naravne smrti, $\epsilon$ pove na koliko plena vpliva en plenilec, $\eta$ pove na koliko plenilcev vpliva en plen in $\kappa$ predstavlja naravno smrt plenilca.
+	Vidimo, da v odsotnosti plena ($y=0$), se hrana eksponentno razmnoži, plenilec pa eksponentno umira. V odsotnosti hrane ($x=0$), se populacija plena močno manjša, saj poleg naravne smrti, ki je eksponentna jedo plen še plenilci. Posledica tega, je tudi izumrtje plenilcev(njihove hrane je zmanjkalo). V odsotnosti plenilcev ($z=0$), pa imamo običajen LV sistem, katerega smo predelali že v prvem poglavju.\\
+	Postavimo parametre na iste vrednosti, kot v prejšnjem poglavju, zaradi lažje primerjave. Torej $\alpha =0.2$, $\beta=0.05$, $\gamma = 0.02$, $\delta = 0.05$, $\epsilon = 0.13$, $\eta = 0.05$ in $\kappa = 0.02$.
+	Poglejmo si graf pri naključnem začetnem pogoju.Iz grafov vidimo, da sistem raste, ne limitira nikamor, edina stacionarna točka, ki jo imamo pa je (0, 0 ,0), kjer pa se ne dogaja nič zanimivega.
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{8mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV4.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa}
+		\end{minipage}
+	\end{figure}
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{8mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV5.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa 3D}
+		\end{minipage}
+	\end{figure}
+	\newpage
+	Poglejmo si še nekaj grafov pri različnih parametrih:
+	Spremenimo $\epsilon= 0.03$, $\eta = 0.02$ in $\delta=0.09$, ostalo ostane enako. Torej smo malce povečali možnost obstanka populacije plena. Z grafa lahko vidimo, da prevladuje plenilec. Prav tako "skoki" plenilcev so ravno takrat, ko je plena največ, isto lahko rečemo za plen in njihovo hrano.
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{8mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV8.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa}
+		\end{minipage}
+	\end{figure}
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{8mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV9.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa 3D}
+		\end{minipage}
+	\end{figure}
+	\newpage
+	\subsection{Eksponentno naraščanje hrane brez naravne smrti plena}
+	Poglejmo še kaj se zgodi, če predpostavimo da je $\delta = 0$ torej naravne smrti plena ni. Ostale parametre pustimo nedotaknjene.
+	V tem primeru imamo zelo zanimiv graf. Temu, pa je tako, ker je plena namreč več, zato je tudi več hrane za plenilca, in se lahko plenilec razmnožuje, hrana pa se tako ali tako razmnožuje eksponentno ne glede na št. plena in št. plenilcev.
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{8mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV13.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa}
+		\end{minipage}
+	\end{figure}
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{8mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV11.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa 3D}
+		\end{minipage}
+	\end{figure}
+	\newpage
+	Prvi graf nam lepo ponazarja, kako usklajeno populacije padajo in naraščajo, vse tri populacije imajo maksimume in minimume ob istem času.
+	Poleg tega, pa tak sistem ima stacionarno točko. Kot vidimo na grafu (12), se začnejo vrednosti približevat določeni vrednosti. Kakšna vrednost pa je to?
+	Zapišimo nov sistem:
+	\vspace{-5mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		0 = \alpha x - \beta x y 
+	\end{flalign}
+	\vspace{-9mm}
+	\begin{flalign}
+		\hspace{-11mm}
+		0 = \gamma x y  - \epsilon y z
+	\end{flalign}
+	\vspace{-9mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		0 = \eta y z - \kappa z 
+	\end{flalign}
+	Iz sistema dobimo, da mora biti $y=\frac{\alpha}{\beta}=\frac{\kappa}{\eta}$, kar je smiselno, saj $y$ nastopa v obeh prvi in tretji enačbi v enaki vlogi, edino kar se spremeni je predznak.
+	Iz druge enačbe pa dobimo pogoj, da je $x=\frac{\epsilon z}{\gamma}$.
+	Torej stacionarna točka poleg točke (0, 0, 0), je še ($\frac{\epsilon z}{\gamma}$,$\frac{\alpha}{\beta}=\frac{\kappa}{\eta}$, $z$), kjer je $z$ poljubna začetna vrednost, oziroma prost parameter. Vidimo pa tudi, da moramo parametre nastaviti na določene vrednost saj $\frac{\alpha}{\beta} = \frac{\kappa}{\eta}$.
+	Poglejmo kakšna točka je to:\\
+	
+	\hspace{25mm}
+	$\begin{pmatrix}
+		\alpha - \beta y & -\beta x & 0 \\
+		\gamma y & \gamma x - \epsilon z   &  \epsilon y \\ 
+		0 & \eta z &  \eta y - \kappa
+	\end{pmatrix}$
+	$=J$\\
+	Izvrednotimo, v stacionarni točki, ki smo jo prej izračunali.\\
+	
+	\hspace{25mm}
+	$\begin{pmatrix}
+		0 & -\frac{\beta \epsilon z}{\gamma} & 0 \\
+		\frac{\alpha \gamma}{\beta}&0  & -\frac{\epsilon \alpha}{\beta} \\ 
+		0 & \eta z &  0
+	\end{pmatrix}$
+	$=J(\frac{\epsilon z}{\gamma},\frac{\alpha}{\beta}, z)$\\
+	Poiščemo še lastne vrednosti:\\
+	$\lambda_1 = 0$, $\lambda_2= -i \frac{1}{5} \sqrt{\frac{13}{10}} \sqrt{z}$, in $\lambda_3 = i \frac{1}{5} \sqrt{\frac{13}{10}} \sqrt{z}$\\
+	Ker imamo eno lastno vrednost ničelno, ostali dve pa sta kompleksno konjugirani velja, da je stacionana točka ponovno privlačnega tipa in sicer spiralna.
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{20mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV16.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa 3D}
+		\end{minipage}
+	\end{figure}
+	\newpage
+	\subsection{Linearno naraščanje hrane brez naravne smrti plena}
+	Poglejmo še kako bi ničelnost člena $\delta$ vplivala na LV sistem z linearnim naraščanjem.
+	Torej sistem bi izgledal takole:
+	\begin{flalign}
+		\hspace*{-12mm}
+		\frac{dx}{dt} = \alpha - \beta x y 
+	\end{flalign}
+	\vspace{-7mm}
+	\begin{flalign}
+		\hspace{-10mm}
+		\frac{dy}{dt} = \gamma x y - \epsilon y z
+	\end{flalign}
+	\vspace{-7mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		\frac{dz}{dt} = \eta y z - \kappa z 
+	\end{flalign}
+	Enačbe enačimo z 0 in rešimo sistem enačb:
+		\begin{flalign}
+		\hspace*{-12mm}
+		0 = \alpha - \beta x y \nonumber
+	\end{flalign}
+	\vspace{-7mm}
+	\begin{flalign}
+		\hspace{-10mm}
+		0 = \gamma x y - \epsilon y z \nonumber
+	\end{flalign}
+	\vspace{-7mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		0 = \eta y z - \kappa z \nonumber
+	\end{flalign}
+	Dobimo rešitev oziroma stacionarno točko ($\frac{\alpha \eta}{\beta \kappa}$,$\frac{\kappa}{\eta}$,$ \frac{\alpha \eta \gamma}{\beta \kappa \epsilon}$).
+	Če izvrednotimo Jacobija v stacionarni točki dobimo:\\
+	
+	\hspace{25mm}
+	$\begin{pmatrix}
+		-\frac{\kappa \beta}{\eta}& -\frac{\eta \alpha}{\kappa} & 0 \\
+		\frac{\kappa \gamma}{\eta}&0  & -\frac{\epsilon \kappa}{\eta} \\ 
+		0 & \frac{\alpha \eta^2\gamma}{\beta \kappa \epsilon} &  0
+	\end{pmatrix}$
+	$=J(\frac{\alpha \eta}{\beta \kappa},\frac{\kappa}{\eta}, \frac{\alpha \eta \gamma}{\beta \kappa \epsilon})$\\
+	Lastne vrednosti te matrike pa so $\lambda_1 = - 0.18024$ $\lambda_2 = - 0.0099 + 0.066i $
+	in $\lambda_3 = - 0.0099 - 0.066i $ Kar pomeni, da je stacionarna točka prav tako spiralno privlačna.
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{-5mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV17.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa 3D}
+		\end{minipage}
+	\end{figure}
+	\newpage
+	\vspace{-12mm}
+	\subsection{Ekpsonentno naraščanje hrane brez naravne smrti plena in linearna smrt plennilca}
+	Če pustimo eksponentno rast hrane, vendar vzamemo linearno smrt plenilca, dobimo podobne rešitve sistema kot pri prejšnemu, le da so x in z koordinati zamenjani in invertirani, y pa postane $\frac{\alpha}{\beta}$. Torej je stacionarna točka \\($\frac{\epsilon \kappa \beta}{\alpha \eta \gamma}$,$\frac{\alpha}{\beta}$, $\frac{\kappa \beta}{\alpha \eta }$).\\
+	Jacobi izvrednoten v stac. točki:\\
+	
+		\hspace{25mm}
+	$\begin{pmatrix}
+		0 & -\frac{\epsilon \kappa \beta^2}{\gamma \alpha \eta} & 0 \\
+		\frac{\alpha \gamma}{\beta}&0  & -\frac{\epsilon \alpha}{\beta} \\ 
+		0 & \frac{\kappa \beta}{\alpha} &  \frac{\eta \alpha}{\beta}
+	\end{pmatrix}$
+	$=J(\frac{\epsilon \kappa \beta}{\alpha \eta \gamma},\frac{\alpha}{\beta}, \frac{\kappa \beta}{\alpha \eta })$\\
+	
+	Ta sistem pa nima privlačne stacionarne točke, kar je tudi smiselno, hrana bo rastla eksponentno, plenilec pa umira počasneje kot prej, več plenilca bo, več bo plena bo umrlo, hrane pa ne bo imel kdo jesti.
+	\\
+	\vspace{-6mm}
+	\subsection{Linearno naraščanje hrane brez naravne smrti plena in linearna smrt plenilca}
+	\vspace{-2mm}
+	Poglejmo si še zadnji zanimiv model in to je model kjer hrana raste linearno, linearno pa poginja tudi plenilec. Enačbe bodo sledeče:\\
+	\vspace{-6mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		\frac{dx}{dt} = \alpha - \beta x y 
+	\end{flalign}
+	\vspace{-7mm}
+	\begin{flalign}
+		\hspace{-10mm}
+		\frac{dy}{dt} = \gamma x y - \epsilon y z
+	\end{flalign}
+	\vspace{-8.5mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		\frac{dz}{dt} = \eta y z - \kappa  
+	\end{flalign}
+	Kot vedno do sedaj enačbe enačimo z nič in rešimo sistem enačb ki bo zgledal takole:
+	\vspace{-5mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		0 = \alpha - \beta x y \nonumber
+	\end{flalign}
+	\vspace{-12mm}
+	\begin{flalign}
+		\hspace{-10mm}
+		0 = \gamma x y - \epsilon y z \nonumber
+	\end{flalign}
+	\vspace{-12mm}
+	\begin{flalign}
+		\hspace*{-12mm}
+		0 = \eta y z - \kappa z  \nonumber
+	\end{flalign}
+	
+	Pri tem sistemu obstaja en pogoj, ki mora biti izpolnjen in sicer dobimo, da produkt parametrov s pozitivnim predznakom v enačbah mora biti enak tistemu z negativnimi predznaki in sicer $ \alpha \gamma \eta = \beta \epsilon \kappa $. 
+	Za rešitev sistema dobimo točko ($\frac{\epsilon z }{\gamma}$, $\frac{\kappa}{\eta z}$, $z$).
+	Ponovno izvrednotimo Jacobija v tej točki in ugotovimo, da je točka privlačna in sicer spiralno privlačna:
+	\vspace{1mm}
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{20mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV18.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa pri naključnih pogojih}
+		\end{minipage}
+	\end{figure}
+	\begin{figure}[!ht]
+		\centering
+		\hspace{-35mm}
+		\vspace{25mm}
+		\begin{minipage}{0.8\textwidth}
+			\centering
+			\vspace{-5mm}
+			\includegraphics*[width=0.8\textwidth]{LV19.png}
+			\hspace{-20mm}
+			\vspace{-5mm}
+			\caption{Populacije v odvisnosti od časa v bližini stacionarne točke 3D}
+		\end{minipage}
+	\end{figure}
+	\newpage
+	\section{Ugotovitve}
+	V prejšnjih nekaj podpoglavjih sem ugotavljal lastnosti različnih Lotka-Volterra modelov. Modela, kjer sem spremenil samo način naraščanja hrane se močno razlikujeta in sicer model z eksponentnim naraščanjem nima stacionarne točke (razen (0,0,0)), medtem ko pri modelu z linearnim naraščanjem najdemo stacionarno točko ki je ($\frac{\alpha \eta}{\beta \kappa}$, $\frac{\kappa}{\eta}$, $\frac{\frac{\delta \alpha \eta}{\beta \kappa} - \gamma}{\epsilon}$). Prav tako se razlikujeta modela, kjer smo privzeli, da naravne smrti plena ni, hkrati smo privzeli še da plenilec umira linearno, spreminjali pa smo način naraščanja hrane iz linearnega v eksponentnega.
+	Opazili smo, da slednji nima stacionarne točke, medtem ko pri primeru z lin. naraščanjem najdemo stac. točko in to je ($\frac{\epsilon z }{\gamma}$, $\frac{\kappa}{\eta z}$, $z$).
+	Primerjajmo še modela kjer smo ohranili eksponentno smrt plenilca in odstranili naravno smrt plena, spreminjali pa smo način naraščanja hrane iz linearnega v eksponenten. Tu pa pri obeh sistemih dobimo stacionarne točke. Pri linearnem je ta točka ($\frac{\alpha \eta}{\beta \kappa}$,$\frac{\kappa}{\eta}$,$ \frac{\alpha \eta \gamma}{\beta \kappa \epsilon}$), pri eksponentnem načinu pa je ta točka ($\frac{\epsilon z}{\gamma}$, $\frac{\alpha}{\beta}=\frac{\kappa}{\eta}$, $z$).
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 
+ 	
+ 	
+\end{document}
